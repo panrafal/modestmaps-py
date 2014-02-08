@@ -45,13 +45,16 @@ parser.add_option('-d', '--dimensions', dest='dimensions', nargs=2,
                   action='store')
 
 parser.add_option('-p', '--provider', dest='provider',
-                  type='choice', help='Map Provider, one of: ' + ', '.join(ModestMaps.builtinProviders.keys()),
-                  choices=ModestMaps.builtinProviders.keys(),
+                  help='Map Provider, one of ' + ', '.join(ModestMaps.builtinProviders.keys()) + ' or URL template like "http://example.com/{Z}/{X}/{Y}.png".',
                   action='store')
 
 parser.add_option('-k', '--apikey', dest='apikey',
                   help='API key for map providers that need one, e.g. CloudMade', type='str',
                   action='store')
+
+parser.add_option('-f', '--fat-bits', dest='fatbits',
+                  help='Optionally look to lower zoom levels if tiles at the requested level are unavailable',
+                  action='store_true')
 
 if __name__ == '__main__':
 
@@ -69,6 +72,12 @@ if __name__ == '__main__':
                     raise BadComposure("Error: Cloudmade provider requires an API key. Register at http://developers.cloudmade.com/")
 
                 provider = ModestMaps.builtinProviders[options.provider](options.apikey)
+            elif options.provider.startswith('http://'):
+                provider = ModestMaps.Providers.TemplatedMercatorProvider(options.provider)
+            elif options.provider.startswith('https://'):
+                provider = ModestMaps.Providers.TemplatedMercatorProvider(options.provider)
+            elif options.provider.startswith('file://'):
+                provider = ModestMaps.Providers.TemplatedMercatorProvider(options.provider)
             else:
                 provider = ModestMaps.builtinProviders[options.provider]()
         except KeyError:
@@ -125,4 +134,4 @@ if __name__ == '__main__':
     if options.verbose:
         print map.coordinate, map.offset, '->', outfile, (map.dimensions.x, map.dimensions.y)
 
-    map.draw(options.verbose).save(outfile)
+    map.draw(options.verbose, options.fatbits).save(outfile)

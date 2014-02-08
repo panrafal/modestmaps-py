@@ -2,12 +2,14 @@
 
 from distutils.core import setup
 
+version = open('VERSION', 'r').read().strip()
+
 setup(name='ModestMaps',
-      version='1.0.1',
+      version=version,
       description='Modest Maps python port',
       author='Michal Migurski',
       url='http://modestmaps.com',
       requires=['PIL'],
       packages=['ModestMaps'],
-      download_url='http://modestmaps.com/dist/ModestMaps-Py-1.0.1.tar.gz',
+      download_url='http://py.modestmaps.com/dist/ModestMaps-%(version)s.tar.gz' % locals(),
       license='BSD')
